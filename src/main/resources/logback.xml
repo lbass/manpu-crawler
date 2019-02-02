@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding= "UTF-8"?>
+<configuration scan="true" scanPeriod="5 seconds">
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss}[%thread][%-5level][%logger{30}\(%line\)] %msg %n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/logs/crawler.log</file>
+		<encoder>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<maxHistory>5</maxHistory>
+			<fileNamePattern>/logs/crawler.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="METRIC_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/logs/metric.log</file>
+		<encoder>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<maxHistory>5</maxHistory>
+			<fileNamePattern>/logs/metric.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
+
+
+	<logger name="jdbc" level="ERROR" />
+
+	<springProfile name="!test,!prod">
+		<logger name="com.manpu.crawler" level="DEBUG" />
+		<logger name="com.manpu.crawler.service.WebtoonService" level="DEBUG" />
+	</springProfile>
+	<springProfile name="test,prod">
+		<logger name="com.manpu.crawler" level="INFO" />
+		<logger name="com.manpu.crawler.schedule.ScheduleManager" level="INFO">
+			<appender-ref ref="METRIC_FILE" />
+		</logger>
+	</springProfile>
+
+	<logger name="jdbc.sqlonly" level="INFO">
+	</logger>
+
+	<root level="INFO">
+		<springProfile name="!test,!prod">
+			<appender-ref ref="CONSOLE" />
+		</springProfile>
+		<springProfile name="test,prod">
+			<appender-ref ref="FILE" />
+		</springProfile>
+	</root>
+</configuration>
